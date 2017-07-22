@@ -1,0 +1,86 @@
+                                 Duh DRAW
+
+                   'Making a DOS-Free world a reality'
+     
+      DuhDraw, written by Ben Fowler and maintained by Pekka Enberg, is a
+      Linux based Open Source clone of TheDRAW, a DOS based ASCII art editor.
+
+  Authors
+
+      Copyright (c) 1996 Ben Fowler
+      Copyright (c) 2002-2003 Pekka Enberg
+
+  License
+
+      Duh Draw is free software. You can distribute and/or modify it under the
+      terms of the GNU General Public License version 2 as published by the
+      Free Software Foundation. Please refer to the file LICENSE for details.
+
+  Using Duh Draw
+
+      Maximum Columns - 80 (Fixed)
+      Maximum Lines - 1000
+ 
+      Home - Beginning of Line/ANSI.
+      End  - End of Line/ANSI.
+      Page Up - Up 23 lines.
+      Page Down - Down 23 lines.
+
+      Delete - Delete character under cursor.
+
+      Insert - Toggle insert mode.
+      When insert mode is active 'In' appears in the status line.
+
+      F1 thru F10 - character in currently selected high ascii set.
+      Shift F1 thru Shift F10 - Select highascii set 1 thru 10.
+
+      High ascii sets 11, 12, 13, 14, 15 are accessed by pressing Alt->
+      or Alt-<.
+
+      Alt-A toggles attribute drawing mode.
+      When in attribute drawing mode 'Attr' will appear in the status
+      line. In this mode moving the cursor causes the character
+      newly under the cursor to acquire the current foreground
+      and background colors.
+ 
+      Alt-B does the block mode thing ALA XxxXxxx.
+      Block mode does not highlight the selected block area yet. It will.
+      You can now copy blocks.
+      Block mode mirror and invert work correctly and
+      mirror (or invert) highascii characters.
+      Translate will change all instances of one color to another
+      while preserving bright/normal intensity.
+      Selecting fill mode will bring up a sub menu to fill
+      using the current foreground color,background color,both foreground
+      and background color or any character you type.
+      You may use one of the highascii characters in the selected set
+      or press Alt-C to use  the last character picked up with Alt-P.
+
+      Alt-C draws using the last character picked up with Alt-P in the
+      current foreground/background color.
+
+      Alt-D toggles line drawing mode.
+      Line drawing uses whatever high ascii set you have selected.
+      Using high ascii sets above set 4 produces odd results.
+      Line drawing mode is not up to snuff yet but will be.
+    
+      Alt-E prompts if you wish to erase the current page.
+      (Currently there is only one page).
+   
+      Alt-F brings up the color bar where you select fore and back
+      colors. Cursor keys to select. Enter to accept.
+      
+      Alt-H  Help screen.
+      Alt-I  Insert Line.
+      Alt-J  Insert Column.
+      Alt-K  Kill (Delete) Column.  
+      Alt-L  Load file.
+      Alt-P  Pickup character under cursor.
+      Alt-S  Save file.
+      Alt-U  Use color under cursor.
+      Alt-X  Exit Duh DRAW.
+      Alt-Y  Yank (Delete) line.
+
+  Limitations
+
+      Animation mode is not supported.

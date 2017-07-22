@@ -1,0 +1,21 @@
+Begin3
+Title:		Duh DRAW
+Version:	2.8.12
+Entered-date:	04/05/2002
+Description:	Graphic ANSI Editor much like XxxXxxx for DOS.
+                Features the ability to translate one colorshading
+                scheme into another,Block Flip and Mirror,SAUCE 
+                support,1000 line maximum ANSI size,IBM highascii
+                character support.Includes utilities to convert created
+                ANSI's to C data statements for inclusion in programs 
+                and a fullscreen scrolling ANSI Viewer.
+Keywords:	ANSI SAUCE 
+Author: 	Ben Fowler (ao@quicklink.com) <- obsolete email
+Maintained-by:	Walt Stoneburner (wls@wwco.com)
+Primary-site:   http://www.wwco.com/~wls/opensource/duhdraw.php
+                45kB DuhDRAW-2.8.12.tar.gz
+Alternate-site: http://www.freshmeat.net/projects/duhdraw/
+Original-site:	sunsite.unc.edu /pub/Linux/docs
+Platforms:	Linux.
+Copying-policy:	GNU copyleft.
+End
