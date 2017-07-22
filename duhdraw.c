@@ -173,7 +173,9 @@ read_dir_entries (struct dir_stats * stats)
   dircount = 0;
   stats->total = 0;
   root = 0;
-  getcwd (stats->pathname, 255);
+  if (getcwd(stats->pathname, 255) == NULL) {
+      perror("getcwd error");
+  }
   if (stats->pathname[0] == '/' && stats->pathname[1] == 0)
     root = 1;
   dirp = opendir (stats->pathname);
@@ -203,7 +205,9 @@ read_dir_entries (struct dir_stats * stats)
 		  continue;
 		}
 	      fseek (fp, -128, SEEK_END);
-	      fread (&sauceinfo, sizeof (struct sauce_info), 1, fp);
+	      if (!fread(&sauceinfo, sizeof (struct sauce_info), 1, fp)) {
+              perror("fread error");
+          };
 	      fclose (fp);
 	      if (memcmp (sauceinfo.sig, "SAUCE00", 7) == 0)
 		{
@@ -1525,8 +1529,6 @@ dorefresh ()
 static void
 dohelp ()
 {
-  int i;
-
   printf ("\e[0m\e[2J\e[1;1H");
   printf ("                                  \e[1;37mDuh DRAW Help\r\n\r\n");
   printf
@@ -1568,7 +1570,7 @@ dohelp ()
   printf ("\e[25;1H\e[1;37;44m%-56.56s", filename);
   printf ("%24.24s", asctime (getdatetime ()));
   printf ("\e[22;1H\e[0;1;37m                                  Press a key.");
-  i = mygetchar ();
+  mygetchar ();
   dorefresh ();
 }
 
@@ -1702,7 +1704,9 @@ loadfile ()
 	case 13:		/* enter */
 	  if (dir_entries[curlo].size == -1)
 	    {
-	      chdir (dir_entries[curlo].name);
+          if (chdir(dir_entries[curlo].name)) {
+              perror("chdir error");
+          };
 	      read_dir_entries (&stats);
 	      refreshdir (&stats);
 	    }
@@ -2974,8 +2978,6 @@ editloop ()
 int
 main (int argc, char *argv[])
 {
-  int c;
-
   savetty ();
   initscr ();
 
@@ -3001,7 +3003,7 @@ main (int argc, char *argv[])
   printf ("\e[0m\e[2J\e[1;34m");
   printf ("%s", screendata);
 
-  c = mygetchar ();
+  mygetchar ();
   fixvars ();
   editloop ();
   printf ("\e(B");		/* set unix character set */
