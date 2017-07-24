@@ -1257,7 +1257,7 @@ ansiscrollup ()
 {
     if ((pos - (SCREEN_HEIGHT * EDIT_BUFFER_WIDTH)) >= 0)
         {
-            pos -= 80;
+            pos -= EDIT_BUFFER_WIDTH;
             screen_redraw (pos - SCREEN_HEIGHT * EDIT_BUFFER_WIDTH);
 
             ishome = 0;
@@ -1381,12 +1381,12 @@ dochar (int c)
     if (insert)
         while (lx >= x)
             {
-                editbuffer[(edit_buffer_y * 80) + lx + 1] =
-                    editbuffer[(edit_buffer_y * 80) + lx];
+                editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + lx + 1] =
+                    editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + lx];
                 lx--;
             }
 
-    editbuffer[(edit_buffer_y * 80) + x] = (c & 255) | attr;
+    editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + x] = (c & 255) | attr;
 
     if (insert)
         {
@@ -1418,8 +1418,8 @@ doattr ()
     int c;
     attr = fore + (back * 16) + (blink * 128);
     attr = attr << 8;
-    c = editbuffer[(edit_buffer_y * 80) + x] & 255;
-    editbuffer[(edit_buffer_y * 80) + x] = c | attr;
+    c = editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + x] & 255;
+    editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + x] = c | attr;
     changed = 1;
     ccolor ();
     cgoto ();
@@ -1473,7 +1473,7 @@ savefile (int w)		/* 0 = whole file,1 = box */
             i = block_upper_left_y;
             mi = block_lower_right_y;
         }
-    pos = i * 80;
+    pos = i * EDIT_BUFFER_WIDTH;
     if (w)
         attr = (editbuffer[pos + block_upper_left_x] >> 8);
     else
@@ -1488,7 +1488,7 @@ savefile (int w)		/* 0 = whole file,1 = box */
 
     for (; i <= mi; i++)
         {
-            pos = i * 80;
+            pos = i * EDIT_BUFFER_WIDTH;
             fdumpline (w);		/* 0 = full line,1 = box */
         }
     fclose (fileout);
@@ -1504,15 +1504,15 @@ dodelete ()
     int i;
 
     i = x;
-    while (i < 80)
+    while (i < EDIT_BUFFER_WIDTH)
         {
-            editbuffer[(edit_buffer_y * 80) + i] =
-                editbuffer[(edit_buffer_y * 80) + i + 1];
+            editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + i] =
+                editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + i + 1];
             i++;
         }
-    editbuffer[(edit_buffer_y * 80) + 79] = 0x0720;
+    editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + 79] = 0x0720;
     printf ("\e[%d;1H", y + 1);
-    pos = edit_buffer_y * 80;
+    pos = edit_buffer_y * EDIT_BUFFER_WIDTH;
     dumpline (pos);
     ccolor ();
     cgoto ();
@@ -1619,7 +1619,7 @@ dolinedraw ()
 
         }
 
-    editbuffer[(edit_buffer_y * 80) + x] = c | attr;
+    editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + x] = c | attr;
     ccolor ();
     cgoto ();
     putc (c, stdout);
@@ -1634,8 +1634,8 @@ fixvars ()
     int c, ok;
     strcpy (statusline, "");
     ishome = 0;
-    lastline = pos / 80;
-    c = lastline * 80;
+    lastline = pos / EDIT_BUFFER_WIDTH;
+    c = lastline * EDIT_BUFFER_WIDTH;
     ok = pos - c;
     if (ok > 0)
         lastline++;
@@ -1773,11 +1773,11 @@ insertline ()
     int i;
     if (alastline < 999)
         {
-            memmove (&(editbuffer[(edit_buffer_y + 1) * 80]),
-                     &(editbuffer[edit_buffer_y * 80]),
+            memmove (&(editbuffer[(edit_buffer_y + 1) * EDIT_BUFFER_WIDTH]),
+                     &(editbuffer[edit_buffer_y * EDIT_BUFFER_WIDTH]),
                      (999 - edit_buffer_y) * 160);
-            for (i = 0; i < 80; i++)
-                editbuffer[(edit_buffer_y * 80) + i] = 0x0720;
+            for (i = 0; i < EDIT_BUFFER_WIDTH; i++)
+                editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + i] = 0x0720;
             alastline++;
             dorefresh ();
         }
@@ -1789,8 +1789,8 @@ deleteline ()
 {
     if (alastline > 0)
         {
-            memmove (&(editbuffer[edit_buffer_y * 80]),
-                     &(editbuffer[(edit_buffer_y + 1) * 80]),
+            memmove (&(editbuffer[edit_buffer_y * EDIT_BUFFER_WIDTH]),
+                     &(editbuffer[(edit_buffer_y + 1) * EDIT_BUFFER_WIDTH]),
                      (999 - edit_buffer_y) * 160);
             alastline--;
             dorefresh ();
@@ -1802,11 +1802,11 @@ static void
 deletecolumn ()
 {
     int i, j;
-    for (j = x; j < 80; j++)
+    for (j = x; j < EDIT_BUFFER_WIDTH; j++)
         for (i = 0; i < 1000; i++)
-            editbuffer[(i * 80) + j] = editbuffer[(i * 80) + j + 1];
+            editbuffer[(i * EDIT_BUFFER_WIDTH) + j] = editbuffer[(i * EDIT_BUFFER_WIDTH) + j + 1];
     for (i = 0; i < 1000; i++)
-        editbuffer[(i * 80) + 79] = 0x0720;
+        editbuffer[(i * EDIT_BUFFER_WIDTH) + 79] = 0x0720;
     dorefresh ();
     changed = 1;
 }
@@ -1819,9 +1819,9 @@ insertcolumn ()
         return;
     for (j = 78; j >= x; j--)
         for (i = 0; i < 1000; i++)
-            editbuffer[(i * 80) + j + 1] = editbuffer[(i * 80) + j];
+            editbuffer[(i * EDIT_BUFFER_WIDTH) + j + 1] = editbuffer[(i * EDIT_BUFFER_WIDTH) + j];
     for (i = 0; i < 1000; i++)
-        editbuffer[(i * 80) + x] = 0x0720;
+        editbuffer[(i * EDIT_BUFFER_WIDTH) + x] = 0x0720;
     dorefresh ();
     changed = 1;
 }
@@ -1945,7 +1945,7 @@ static void
 flipblock ()
 {
     int ty1, ty2, tx;
-    int tempbuf[80];
+    int tempbuf[EDIT_BUFFER_WIDTH];
     ty1 = block_upper_left_y;
     ty2 = block_lower_right_y;
 
@@ -1953,9 +1953,9 @@ flipblock ()
         {
             for (tx = block_upper_left_x; tx <= block_lower_right_x; tx++)
                 {
-                    tempbuf[tx] = editbuffer[(ty1 * 80) + tx];	/* save line */
-                    editbuffer[(ty1 * 80) + tx] = flipchar (editbuffer[(ty2 * 80) + tx]);	/* move bottom to top */
-                    editbuffer[(ty2 * 80) + tx] = flipchar (tempbuf[tx]);
+                    tempbuf[tx] = editbuffer[(ty1 * EDIT_BUFFER_WIDTH) + tx];	/* save line */
+                    editbuffer[(ty1 * EDIT_BUFFER_WIDTH) + tx] = flipchar (editbuffer[(ty2 * EDIT_BUFFER_WIDTH) + tx]);	/* move bottom to top */
+                    editbuffer[(ty2 * EDIT_BUFFER_WIDTH) + tx] = flipchar (tempbuf[tx]);
                 }
             ty1++;
             ty2--;
@@ -2122,10 +2122,10 @@ mirrorblock ()			/* left <> right mirror */
             tx2 = block_lower_right_x;
             while (tx1 <= tx2)
                 {
-                    c1 = editbuffer[(ty * 80) + tx1];
-                    c2 = editbuffer[(ty * 80) + tx2];
-                    editbuffer[(ty * 80) + tx1] = mirrorchar (c2);
-                    editbuffer[(ty * 80) + tx2] = mirrorchar (c1);
+                    c1 = editbuffer[(ty * EDIT_BUFFER_WIDTH) + tx1];
+                    c2 = editbuffer[(ty * EDIT_BUFFER_WIDTH) + tx2];
+                    editbuffer[(ty * EDIT_BUFFER_WIDTH) + tx1] = mirrorchar (c2);
+                    editbuffer[(ty * EDIT_BUFFER_WIDTH) + tx2] = mirrorchar (c1);
                     tx1++;
                     tx2--;
                 }
@@ -2138,7 +2138,7 @@ eraseblock ()
     int i, ty;
     for (ty = block_upper_left_y; ty <= block_lower_right_y; ty++)
         for (i = block_upper_left_x; i <= block_lower_right_x; i++)
-            editbuffer[(ty * 80) + i] = 0x0720;
+            editbuffer[(ty * EDIT_BUFFER_WIDTH) + i] = 0x0720;
 }
 
 static void
@@ -2151,7 +2151,7 @@ transcolor (int tc, int nc)
     for (ty = block_upper_left_y; ty <= block_lower_right_y; ty++)
         for (i = block_upper_left_x; i <= block_lower_right_x; i++)
             {
-                c = editbuffer[(ty * 80) + i];
+                c = editbuffer[(ty * EDIT_BUFFER_WIDTH) + i];
                 ebg = (c & 0x7000) >> 12;
                 efg = (c & 0x0700) >> 8;
                 if (ebg == tc)
@@ -2161,7 +2161,7 @@ transcolor (int tc, int nc)
                 c = c & 0x88FF;
                 c = c | (efg << 8);
                 c = c | (ebg << 12);
-                editbuffer[(ty * 80) + i] = c;
+                editbuffer[(ty * EDIT_BUFFER_WIDTH) + i] = c;
             }
     changed = 1;
 }
@@ -2253,12 +2253,12 @@ doblock ()
                             for (ty = block_upper_left_y; ty <= block_lower_right_y; ty++)
                                 for (i = block_upper_left_x; i <= block_lower_right_x; i++)
                                     {
-                                        c = editbuffer[(ty * 80) + i];
+                                        c = editbuffer[(ty * EDIT_BUFFER_WIDTH) + i];
                                         c = c & 0x70FF;
                                         c = c | (fore << 8);
                                         if (blink)
                                             c = c | 0x8000;
-                                        editbuffer[(ty * 80) + i] = c;
+                                        editbuffer[(ty * EDIT_BUFFER_WIDTH) + i] = c;
                                     }
                             changed = 1;
                             break;
@@ -2268,10 +2268,10 @@ doblock ()
                             for (ty = block_upper_left_y; ty <= block_lower_right_y; ty++)
                                 for (i = block_upper_left_x; i <= block_lower_right_x; i++)
                                     {
-                                        c = editbuffer[(ty * 80) + i];
+                                        c = editbuffer[(ty * EDIT_BUFFER_WIDTH) + i];
                                         c = c & 0x8FFF;
                                         c = c | (back << 12);
-                                        editbuffer[(ty * 80) + i] = c;
+                                        editbuffer[(ty * EDIT_BUFFER_WIDTH) + i] = c;
                                     }
                             changed = 1;
                             break;
@@ -2285,9 +2285,9 @@ doblock ()
                             for (ty = block_upper_left_y; ty <= block_lower_right_y; ty++)
                                 for (i = block_upper_left_x; i <= block_lower_right_x; i++)
                                     {
-                                        c = editbuffer[(ty * 80) + i] & 0xFF;
+                                        c = editbuffer[(ty * EDIT_BUFFER_WIDTH) + i] & 0xFF;
                                         c = c | attr;
-                                        editbuffer[(ty * 80) + i] = c;
+                                        editbuffer[(ty * EDIT_BUFFER_WIDTH) + i] = c;
                                     }
                             changed = 1;
                             break;
@@ -2345,7 +2345,7 @@ doblock ()
                             c = c | attr;
                             for (ty = block_upper_left_y; ty <= block_lower_right_y; ty++)
                                 for (i = block_upper_left_x; i <= block_lower_right_x; i++)
-                                    editbuffer[(ty * 80) + i] = c;
+                                    editbuffer[(ty * EDIT_BUFFER_WIDTH) + i] = c;
                             changed = 1;
                             break;
 
@@ -2544,7 +2544,7 @@ editloop ()
                     if (x > 0)
                         {
                             x = x - 1;
-                            editbuffer[(edit_buffer_y * 80) + x] = 0x0720;
+                            editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + x] = 0x0720;
                             cgoto ();
                             printf ("\e[0m");
                             putc (' ', stdout);
@@ -2850,7 +2850,7 @@ editloop ()
                     break;
 
                 case 256 + 'p':		/* ? */
-                    lastchar = editbuffer[(edit_buffer_y * 80) + x] & 0xFF;
+                    lastchar = editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + x] & 0xFF;
                     break;
 
                 case 256 + 'q':		/* ? */
@@ -2867,7 +2867,7 @@ editloop ()
                     break;
 
                 case 256 + 'u':		/* alt-u */
-                    attr = editbuffer[(edit_buffer_y * 80) + x];
+                    attr = editbuffer[(edit_buffer_y * EDIT_BUFFER_WIDTH) + x];
                     attr = attr >> 8;
                     fore = attr & 15;
                     back = (attr >> 4) & 7;
