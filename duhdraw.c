@@ -1803,9 +1803,9 @@ deletecolumn ()
 {
     int i, j;
     for (j = x; j < EDIT_BUFFER_WIDTH; j++)
-        for (i = 0; i < 1000; i++)
+        for (i = 0; i < EDIT_BUFFER_HEIGHT; i++)
             editbuffer[(i * EDIT_BUFFER_WIDTH) + j] = editbuffer[(i * EDIT_BUFFER_WIDTH) + j + 1];
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < EDIT_BUFFER_HEIGHT; i++)
         editbuffer[(i * EDIT_BUFFER_WIDTH) + 79] = 0x0720;
     dorefresh ();
     changed = 1;
@@ -1818,9 +1818,9 @@ insertcolumn ()
     if (x == 79)
         return;
     for (j = 78; j >= x; j--)
-        for (i = 0; i < 1000; i++)
+        for (i = 0; i < EDIT_BUFFER_HEIGHT; i++)
             editbuffer[(i * EDIT_BUFFER_WIDTH) + j + 1] = editbuffer[(i * EDIT_BUFFER_WIDTH) + j];
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < EDIT_BUFFER_HEIGHT; i++)
         editbuffer[(i * EDIT_BUFFER_WIDTH) + x] = 0x0720;
     dorefresh ();
     changed = 1;
